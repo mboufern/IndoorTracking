@@ -1,0 +1,5 @@
+[
+    {"id" : 0, "room" : 1, "dataEntry" : {"id" : 0, "mac" : "ac:3f:aa:30:ea", "pwr" : -54, "sesor" : "s1", "created_at" : "1/3/22 13:03"}},
+    {"id" : 1, "room" : 1, "dataEntry" : {"id" : 3, "mac" : "ac:3f:aa:30:ea", "pwr" : -64, "sesor" : "s2", "created_at" : "1/3/22 13:04"}},
+    {"id" : 2, "room" : 1, "dataEntry" : {"id" : 14, "mac" : "ac:3f:aa:30:ea", "pwr" : -72, "sesor" : "s2", "created_at" : "1/3/22 13:05"}}
+]
