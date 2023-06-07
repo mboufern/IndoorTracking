@@ -7,17 +7,26 @@ obj = json.loads(rawData)
 
 # print(obj[0]["dataEntry"]["pwr"])
 
-def sensorFilter(value):
-    
-    pwr = value["pwr"]
-    
+def rowEmpty():
+    for i in range(sensorCount):
+        row.append(0)
+
+def rowVerify():
+    for i in row:
+        if(i == 0):
+            return False
+    return True
+
+
 
 data = []
-row = [0, 0, 0]
-
+sensorCount = 3
 timeInterval = 1
-rowIndex = 1
-isRowValid = True
+
+
+row = []
+rowEmpty()
+
 curentSecond = -1
 
 for entry in obj:
@@ -25,15 +34,18 @@ for entry in obj:
     entryPwr = int(entry["dataEntry"]["pwr"])
     entrySensor = int(entry["dataEntry"]["sensor"][-1]) - 1
 
-    if(entryTime == curentSecond):
+    if(entryTime <= (curentSecond + timeInterval - 1)):
         row[entrySensor] = entryPwr
-    elif(row[0]!=0 and row[1]!=0 and row[2]!=0 and entryTime > (curentSecond + timeInterval - 1)):
+    elif(rowVerify()):
         data.append(row)
-        isRowValid = True
+        curentSecond = entryTime
+        row = []
+        rowEmpty()
+        row[entrySensor] = entryPwr
     else:
         curentSecond = entryTime
-        row = [0, 0, 0]
+        row = []
+        rowEmpty()
         row[entrySensor] = entryPwr
-        isRowValid = False
 
 print(data)
