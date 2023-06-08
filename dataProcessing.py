@@ -61,7 +61,7 @@ print(y_train)
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-new_entry = [50, 40, 50]
+new_entry = [-2, -80, -50]
 
 predicted_value = model.predict([new_entry])
 
