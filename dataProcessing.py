@@ -2,12 +2,14 @@ import json
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
+#importing data_________________________________
+
 with open('roomData.json', 'r') as file:
     rawData=file.read()
 
 obj = json.loads(rawData)
 
-# print(obj[0]["dataEntry"]["pwr"])
+#methods________________________________________
 
 def rowEmpty(room):
     for i in range(sensorCount):
@@ -20,18 +22,19 @@ def rowVerify():
             return False
     return True
 
-
+#Processing settings____________________________
 
 data = []
 sensorCount = 3
 timeInterval = 1
-
 
 row = []
 room = int(obj[0]["room"])
 rowEmpty(room)
 
 curentSecond = -30
+
+#Processing into triplets_______________________
 
 for entry in obj:
     entryTime = int(entry["dataEntry"]["created_at"][-2:])
@@ -44,13 +47,10 @@ for entry in obj:
 
     if(entryTime <= (curentSecond + timeInterval - 1)):
         row[entrySensor] = entryPwr
-    elif(rowVerify()):
-        data.append(row)
-        curentSecond = entryTime
-        row = []
-        rowEmpty(room)
-        row[entrySensor] = entryPwr
     else:
+        if(rowVerify()):
+            data.append(row)
+
         curentSecond = entryTime
         row = []
         rowEmpty(room)
@@ -58,14 +58,18 @@ for entry in obj:
 
 print(data)
 
+#Training___________________________________________
+
 X_train = np.array([d[:-1] for d in data])
 y_train = np.array([d[-1] for d in data])
 
-print(X_train)
-print(y_train)
+# print(X_train)
+# print(y_train)
+
 model = LinearRegression()
 model.fit(X_train, y_train)
 
+#Prediction________________________________________
 new_entry = [-2, -80, -50]
 
 predicted_value = model.predict([new_entry])
