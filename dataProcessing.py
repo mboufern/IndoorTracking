@@ -28,14 +28,19 @@ timeInterval = 1
 
 
 row = []
-rowEmpty(int(obj[0]["room"]))
+room = int(obj[0]["room"])
+rowEmpty(room)
 
-curentSecond = -1
+curentSecond = -30
 
 for entry in obj:
     entryTime = int(entry["dataEntry"]["created_at"][-2:])
     entryPwr = int(entry["dataEntry"]["pwr"])
     entrySensor = int(entry["dataEntry"]["sensor"][-1]) - 1
+
+    if(room != int(entry["room"])):
+        room = int(entry["room"])
+        curentSecond = entryTime
 
     if(entryTime <= (curentSecond + timeInterval - 1)):
         row[entrySensor] = entryPwr
@@ -43,12 +48,12 @@ for entry in obj:
         data.append(row)
         curentSecond = entryTime
         row = []
-        rowEmpty(int(entry["room"]))
+        rowEmpty(room)
         row[entrySensor] = entryPwr
     else:
         curentSecond = entryTime
         row = []
-        rowEmpty(int(entry["room"]))
+        rowEmpty(room)
         row[entrySensor] = entryPwr
 
 print(data)
