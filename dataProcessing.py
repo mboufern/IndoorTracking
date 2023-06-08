@@ -1,4 +1,6 @@
 import json
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 with open('roomData.json', 'r') as file:
     rawData=file.read()
@@ -7,9 +9,10 @@ obj = json.loads(rawData)
 
 # print(obj[0]["dataEntry"]["pwr"])
 
-def rowEmpty():
+def rowEmpty(room):
     for i in range(sensorCount):
         row.append(0)
+    row.append(room)
 
 def rowVerify():
     for i in row:
@@ -25,7 +28,7 @@ timeInterval = 1
 
 
 row = []
-rowEmpty()
+rowEmpty(int(obj[0]["room"]))
 
 curentSecond = -1
 
@@ -40,12 +43,26 @@ for entry in obj:
         data.append(row)
         curentSecond = entryTime
         row = []
-        rowEmpty()
+        rowEmpty(int(entry["room"]))
         row[entrySensor] = entryPwr
     else:
         curentSecond = entryTime
         row = []
-        rowEmpty()
+        rowEmpty(int(entry["room"]))
         row[entrySensor] = entryPwr
 
 print(data)
+
+X_train = np.array([d[:-1] for d in data])
+y_train = np.array([d[-1] for d in data])
+
+print(X_train)
+print(y_train)
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+new_entry = [50, 40, 50]
+
+predicted_value = model.predict([new_entry])
+
+print("Predicted value: ", predicted_value[0])
