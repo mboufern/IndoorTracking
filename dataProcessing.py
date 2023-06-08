@@ -44,6 +44,8 @@ for entry in obj:
     if(room != int(entry["room"])):
         room = int(entry["room"])
         curentSecond = entryTime
+        row = []
+        rowEmpty(room)
 
     if(entryTime <= (curentSecond + timeInterval - 1)):
         row[entrySensor] = entryPwr
