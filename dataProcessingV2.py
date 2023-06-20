@@ -1,6 +1,9 @@
 import json
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import accuracy_score
 
 #importing data_________________________________
 
@@ -60,18 +63,30 @@ for entry in obj:
 
 #Training___________________________________________
 
-X_train = np.array([d[:-1] for d in data])
-y_train = np.array([d[-1] for d in data])
+coordinates = np.array([d[:-1] for d in data])
+labels = np.array([d[-1] for d in data])
 
-print(X_train)
-# print(y_train)
 
-model = LinearRegression()
-model.fit(X_train, y_train)
+print(coordinates)
 
-#Prediction________________________________________
-new_entry = [-2, -80, -50]
+X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.2, random_state=42)
 
-predicted_value = model.predict([new_entry])
+scaler = MinMaxScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
 
-print("Predicted value: ", predicted_value[0])
+
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train_scaled, y_train)
+
+
+y_pred = knn.predict(X_test_scaled)
+
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+
+
+new_coordinates = [[20, 13, 5], [-70, -80, -40]]
+new_coordinates_scaled = scaler.transform(new_coordinates)
+new_predictions = knn.predict(new_coordinates_scaled)
+print("Predictions for new coordinates:", new_predictions)
