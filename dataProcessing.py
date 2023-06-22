@@ -64,7 +64,6 @@ X_train = np.array([d[:-1] for d in data])
 y_train = np.array([d[-1] for d in data])
 
 print(X_train)
-# print(y_train)
 
 model = LinearRegression()
 model.fit(X_train, y_train)

@@ -1,0 +1,10 @@
+[
+    {"MAC" : "ac:3f:aa:30:ea", "sensor" : 1, "PWR" : -30},
+    {"MAC" : "ac:3f:aa:30:ea", "sensor" : 2, "PWR" : -20},
+    {"MAC" : "ac:3f:aa:30:ea", "sensor" : 3, "PWR" : -80},
+
+    {"MAC" : "b2:a2:c5:55:f1", "sensor" : 1, "PWR" : -50},
+    {"MAC" : "b2:a2:c5:55:f1", "sensor" : 2, "PWR" : -60},
+    {"MAC" : "b2:a2:c5:55:f1", "sensor" : 3, "PWR" : -90}
+]
+
