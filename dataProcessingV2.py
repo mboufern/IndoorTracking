@@ -44,6 +44,9 @@ def rowVerify(row):
 def pross(obj):
     room = int(obj[0]["room"])
     rowEmpty(room)
+
+    curentSecond = int(obj[0]["dataEntry"]["created_at"][-2:])
+    
     for entry in obj:
         entryTime = int(entry["dataEntry"]["created_at"][-2:])
         entryPwr = int(entry["dataEntry"]["pwr"])
@@ -58,8 +61,7 @@ def pross(obj):
         if(entryTime <= (curentSecond + timeInterval - 1)):
             row[entrySensor] = entryPwr
         else:
-            if(rowVerify(row)):
-                data.append(row)
+            data.append(row)
 
             curentSecond = entryTime
             row = []
