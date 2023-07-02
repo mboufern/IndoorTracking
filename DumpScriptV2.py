@@ -8,6 +8,7 @@ import re
 import json
 import datetime
 import requests
+from urllib3 import PoolManager
 
 from rich.console import Console
 from rich.prompt import Prompt
@@ -20,10 +21,10 @@ def parse_csv_line(line):
         if len(row[2]) >= 16:
             now = datetime.datetime.now()
             return {
-                'sensor_id': '1',
+                'SensorName': '0',
                 'MAC': row[2].strip(),
-                'pwr': row[3].strip(),
-                'TIME': now.strftime('%Y-%m-%d %H:%M:%S'),
+                'PWR': row[3].strip(),
+                'log_at': now.strftime('%Y-%m-%d %H:%M:%S'),
             }
     return None
 
@@ -49,7 +50,7 @@ def get_wifi_data(interface):
             # check if the device was already scanned, if yes check if his power has changed(remove the existing one and replace it with the new one). if not add the new device to the list
             exist = False
             for l in list:
-                if data['MAC'] == l['MAC'] and data['pwr'] == l['pwr']:
+                if data['MAC'] == l['MAC'] and data['PWR'] == l['PWR']:
                     exist = True
                     break
                 elif data['MAC'] == l['MAC']:
@@ -63,10 +64,26 @@ def get_wifi_data(interface):
     # Kill the airodump-ng process
     proc.kill()
 
-url = "http://127.0.0.1:8000/api/data_entry"
+url = "http://192.168.56.1:8000/api/dataentry"
+
+# int_address = ('192.168.56.101', 0)
+# pool_manager = PoolManager(source_address = int_address)
+
 list = []
 for data in get_wifi_data('wlan0'):
     print(data)
     list.append(data)
-    # requests.post(url, json = data)
+    try:
+        response = requests.post(url, data = json.dumps(data), headers = {'Content-Type': 'application/json'})
+
+        if response.status == 200:
+            print('Request successful')
+            print(response.data.decode())
+        else:
+            print('Request failed')
+            print('Status Code:', response.status)
+            print('Response:', response.data.decode())
+
+    except requests.exceptions.RequestException as e:
+        print('An error occurred:', e)
 
