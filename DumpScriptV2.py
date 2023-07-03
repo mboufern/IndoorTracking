@@ -21,7 +21,7 @@ def parse_csv_line(line):
         if len(row[2]) >= 16:
             now = datetime.datetime.now()
             return {
-                'SensorName': '0',
+                'SensorName': 0,
                 'MAC': row[2].strip(),
                 'PWR': row[3].strip(),
                 'log_at': now.strftime('%Y-%m-%d %H:%M:%S'),
@@ -76,13 +76,13 @@ for data in get_wifi_data('wlan0'):
     try:
         response = requests.post(url, data = json.dumps(data), headers = {'Content-Type': 'application/json'})
 
-        if response.status == 200:
+        if response.status_code == 200:
             print('Request successful')
-            print(response.data.decode())
+            print(response.text)
         else:
             print('Request failed')
-            print('Status Code:', response.status)
-            print('Response:', response.data.decode())
+            print('Status Code:', response.status_code)
+            print('Response:', response.text)
 
     except requests.exceptions.RequestException as e:
         print('An error occurred:', e)
