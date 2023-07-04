@@ -16,7 +16,7 @@ import requests
 
 #Processing settings____________________________
 data = []
-sensorCount = 3
+sensorCount = 2
 timeInterval = 1
 
 row = []
@@ -30,6 +30,7 @@ trained = False
 #methods________________________________________
 
 def rowEmpty(room):
+    global row
     for i in range(sensorCount):
         row.append(0)
     row.append(room)
@@ -43,15 +44,16 @@ def rowVerify(row):
 #Processing into triplets and training_______________________
 
 def pross(obj):
+    global data
+    global row
     room = int(obj[0]["room"])
     rowEmpty(room)
 
-    curentSecond = int(obj[0]["dataEntry"]["created_at"][-2:])
-    
+    curentSecond = int(obj[0]["dataEntry"]["created_at"][-10:-8])
     for entry in obj:
-        entryTime = int(entry["dataEntry"]["created_at"][-2:])
-        entryPwr = int(entry["dataEntry"]["pwr"])
-        entrySensor = int(entry["dataEntry"]["sensor"]) - 1
+        entryTime = int(entry["dataEntry"]["created_at"][-10:-8])
+        entryPwr = int(entry["dataEntry"]["PWR"])
+        entrySensor = int(entry["dataEntry"]["sensor"])
 
         if(room != int(entry["room"])):
             room = int(entry["room"])
@@ -69,25 +71,25 @@ def pross(obj):
             rowEmpty(room)
             row[entrySensor] = entryPwr
     
-        coordinates = np.array([d[:-1] for d in data])
-        labels = np.array([d[-1] for d in data])
+    coordinates = np.array([d[:-1] for d in data])
+    labels = np.array([d[-1] for d in data])
 
-        print(coordinates)
+    print(data)
 
-        X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.2, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.2, random_state=1)
 
-        scaler = MinMaxScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
+    scaler = MinMaxScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
 
-        knn = KNeighborsClassifier(n_neighbors=3)
-        knn.fit(X_train_scaled, y_train)
-        y_pred = knn.predict(X_test_scaled)
+    knn = KNeighborsClassifier(n_neighbors=3)
+    knn.fit(X_train_scaled, y_train)
+    y_pred = knn.predict(X_test_scaled)
 
-        accuracy = accuracy_score(y_test, y_pred)
-        print("Accuracy:", accuracy)
-        
-        trained = True
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
+    
+    trained = True
 
 #Prediction___________________________________________
 def predict(data, new_coordinates):
@@ -111,17 +113,16 @@ def prepare(toPredict):
 
     for t in toPredict:
         if(t["MAC"] == currentMac):
-            row[t["sensor"] - 1] = t["PWR"]
+            row[t["sensor"]] = t["PWR"]
         else:
-            if(rowVerify(row)):
-                result.append(row)
+            result.append(row)
             
             currentMac = t["MAC"]
             for i in range(sensorCount):
                 row.append(0)
             row.append(currentMac)
 
-            row[t["sensor"] - 1] = t["PWR"]
+            row[t["sensor"]] = t["PWR"]
     
     return result
 
@@ -197,8 +198,8 @@ while True:
     print("1 - Ask for data to train a model\n2 - Get and send back prediction")
     choice = input()
     if(choice == "1"):
-        training_request
+        training_request()
     elif(choice == "2"):
-        prediction_request
+        prediction_request()
     else:
         break
