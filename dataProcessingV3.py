@@ -16,7 +16,7 @@ import requests
 
 #Processing settings____________________________
 data = []
-sensorCount = 2
+sensorCount = 1
 timeInterval = 1
 
 row = []
@@ -70,13 +70,13 @@ def pross(obj):
             row = []
             rowEmpty(room)
             row[entrySensor] = entryPwr
-    
+    print(data)
     coordinates = np.array([d[:-1] for d in data])
     labels = np.array([d[-1] for d in data])
 
-    print(data)
+    print(list(zip(coordinates, labels)))
 
-    X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.2, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.1)
 
     scaler = MinMaxScaler()
     X_train_scaled = scaler.fit_transform(X_train)
@@ -140,7 +140,6 @@ def training_request():
         if response.status_code == 200:
             print('Training request successful')
             ndata = response.json()
-            print(ndata)
             pross(ndata)
         else:
             print('Request failed')
@@ -172,7 +171,7 @@ def prediction_request():
                 MacAndPrediction = [[x, y] for x, y in zip(new_MAC, predictions)]
 
                 try:
-                    response = requests.get(sendPrediction_url, data=MacAndPrediction, headers = {'Content-Type': 'application/json'})
+                    response = requests.post(sendPrediction_url, data=MacAndPrediction, headers = {'Content-Type': 'application/json'})
 
                     if response.status_code == 200:
                         print('Training request successful')
