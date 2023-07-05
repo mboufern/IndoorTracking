@@ -16,8 +16,9 @@ import requests
 
 #Processing settings____________________________
 data = []
-sensorCount = 1
+sensorCount = 2
 timeInterval = 1
+scaler = 0
 
 row = []
 room = 0
@@ -44,9 +45,13 @@ def rowVerify(row):
 #Processing into triplets and training_______________________
 
 def pross(obj):
+    global knn
+    global trained
     global data
     global row
+    global scaler
     room = int(obj[0]["room"])
+    row = []
     rowEmpty(room)
 
     curentSecond = int(obj[0]["dataEntry"]["created_at"][-10:-8])
@@ -74,6 +79,8 @@ def pross(obj):
     coordinates = np.array([d[:-1] for d in data])
     labels = np.array([d[-1] for d in data])
 
+    data = []
+
     print(list(zip(coordinates, labels)))
 
     X_train, X_test, y_train, y_test = train_test_split(coordinates, labels, test_size=0.1)
@@ -93,7 +100,7 @@ def pross(obj):
 
 #Prediction___________________________________________
 def predict(data, new_coordinates):
-    scaler = MinMaxScaler()
+    global scaler
     # new_coordinates = [[20, 13, 5], [-70, -80, -40]]
     new_coordinates_scaled = scaler.transform(new_coordinates)
     new_predictions = knn.predict(new_coordinates_scaled)
@@ -105,25 +112,25 @@ def predict(data, new_coordinates):
 def prepare(toPredict):
     result = []
     row = []
-    currentMac = toPredict[0]["MAC"]
+    currentMac = toPredict[0]["id"]
     
     for i in range(sensorCount):
         row.append(0)
     row.append(currentMac)
 
     for t in toPredict:
-        if(t["MAC"] == currentMac):
-            row[t["sensor"]] = t["PWR"]
+        if(t["id"] == currentMac):
+            row[t["sensor"] - 1] = t["PWR"]
         else:
             result.append(row)
-            
-            currentMac = t["MAC"]
+            currentMac = t["id"]
+            row = []
             for i in range(sensorCount):
                 row.append(0)
             row.append(currentMac)
 
-            row[t["sensor"]] = t["PWR"]
-    
+            row[t["sensor"] - 1] = t["PWR"]
+    print(result)
     return result
 
 #receiving request_________________________________________
@@ -136,7 +143,6 @@ sendPrediction_url = "http://192.168.56.1:8000/api/device/updateRoom"
 def training_request():
     try:
         response = requests.get(training_url)
-
         if response.status_code == 200:
             print('Training request successful')
             ndata = response.json()
@@ -150,7 +156,7 @@ def training_request():
         print('An error occurred:', e)
 
 
-
+# predict request______________________________________________
 
 def prediction_request():
     if(trained):
@@ -169,9 +175,13 @@ def prediction_request():
                 predictions = predict(data, new_cordinates)
 
                 MacAndPrediction = [[x, y] for x, y in zip(new_MAC, predictions)]
-
+                
+                converted_list_of_lists = [[int(item[0]), int(item[1])] for item in MacAndPrediction]
+                jdata = {'predictions': converted_list_of_lists}
+                json_data = json.dumps(jdata)
+                print(json_data)
                 try:
-                    response = requests.post(sendPrediction_url, data=MacAndPrediction, headers = {'Content-Type': 'application/json'})
+                    response = requests.post(sendPrediction_url, data=json_data, headers = {'Content-Type': 'application/json'})
 
                     if response.status_code == 200:
                         print('Training request successful')

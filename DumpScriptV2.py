@@ -31,7 +31,7 @@ def parse_csv_line(line):
 
 def get_wifi_data(interface):
     # Run airodump-ng command and continuously capture output to a dictionary
-    cmd = f'airodump-ng -w /tmp/dump --output-format csv --ivs {interface}'
+    cmd = f'airodump-ng -w /tmp/dump --output-format csv --write-interval 1 {interface}'
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     csvreader = csv.reader(io.TextIOWrapper(proc.stdout), delimiter=',')
