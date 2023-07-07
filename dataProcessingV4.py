@@ -207,8 +207,8 @@ def prediction_request():
 
 def input_handler():
     while True:
-        choice = input("Press 1 to ask for the train data")
-        if(choice != 1):
+        choice = input("Press 1 to ask for the train data\n")
+        if(choice != "1"):
             break
         training_request()
 
