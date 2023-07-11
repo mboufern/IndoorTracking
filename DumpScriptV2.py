@@ -19,7 +19,7 @@ def parse_csv_line(line):
     row = re.split(r'\s+', line.strip())
     if len(row) > 3:
         if len(row[2]) >= 16:
-            now = datetime.datetime.now()
+            now = datetime.now()
             return {
                 'SensorName': 0,
                 'MAC': row[2].strip(),
