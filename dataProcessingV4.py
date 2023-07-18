@@ -219,4 +219,4 @@ while True:
     if(trained):
         print("Get and send back prediction every 2 seconds")
         prediction_request()
-        time.sleep(2)
+    time.sleep(2)

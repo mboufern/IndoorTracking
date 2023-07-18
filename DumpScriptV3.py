@@ -139,7 +139,6 @@ def send_fake_probe_requests():
             )
 
             sendp(probe_request, iface='wlan0', verbose=False)
-            print("sent")
         time.sleep(1)
 
 monitor_thread = threading.Thread(target=send_fake_probe_requests)
